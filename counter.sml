@@ -8,19 +8,6 @@ fun yield (C k: ('a, 'b) coroution) (v: 'a) : 'b * ('a, 'b) coroution =
     callcc (fn self => throw (k, (v, C self)))
 
 fun coroutine (f: 'a * ('b, 'a) coroution -> ('a, 'b) coroution) : ('a, 'b) coroution =
-    callcc
-        (fn (exit: ('a, 'b) coroution  t) =>
-            f ( callcc (fn (k: ('a * ('b, 'a) coroution)  t) =>
-                           throw (exit, C k)
-                       )
-              )
-        )
-
-(* fun coroutine' (exit: ('a, 'b) coroution -> unit) *)
-(*                (f: (('a, 'b) coroution -> unit) -> 'a * ('b, 'a) coroution -> unit) : unit = *)
-(*     exit (C (f exit)) *)
-
-fun coroutine'' (f: 'a * ('b, 'a) coroution -> ('a, 'b) coroution) : ('a, 'b) coroution =
     callcc (fn exit => C (prepend (exit, f)))
 
 
@@ -43,4 +30,4 @@ fun reader (f: (unit, int) coroution): unit =
     in
         ()
     end
-val _ = reader (coroutine'' (fn (_, k) => counter k));;
+val _ = reader (coroutine (fn (_, k) => counter k));;
