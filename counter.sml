@@ -16,6 +16,14 @@ fun coroutine (f: 'a * ('b, 'a) coroution -> ('a, 'b) coroution) : ('a, 'b) coro
               )
         )
 
+(* fun coroutine' (exit: ('a, 'b) coroution -> unit) *)
+(*                (f: (('a, 'b) coroution -> unit) -> 'a * ('b, 'a) coroution -> unit) : unit = *)
+(*     exit (C (f exit)) *)
+
+fun coroutine'' (f: 'a * ('b, 'a) coroution -> ('a, 'b) coroution) : ('a, 'b) coroution =
+    callcc (fn exit => C (prepend (exit, f)))
+
+
 (* Real Imp *)
 
 fun counter (client: (int, unit) coroution): (unit, int) coroution =
@@ -35,4 +43,4 @@ fun reader (f: (unit, int) coroution): unit =
     in
         ()
     end
-val _ = reader (coroutine (fn (_, k) => counter k));;
+val _ = reader (coroutine'' (fn (_, k) => counter k));;
